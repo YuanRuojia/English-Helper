@@ -1,0 +1,25 @@
+server:
+  port: 9001
+
+spring:
+  datasource:
+    #      有的mysql如5.0 下面必须改成com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.64.128:3306/english_helper?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2b8
+    username: root
+    password: 'root'
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+logging:
+  file:
+    path: ./logs
+  level:
+    com.example: debug
+
+youdao:
+  appKey: 53f970f5dc5a815c
+  appSecret: 6cTg0jrYEXG1ZqfTYUcX4zX8zWRzCRUz
+  url: https://openapi.youdao.com/api
+
+
