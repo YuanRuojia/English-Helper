@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>English_Helper</title>
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<link rel="stylesheet" href="css/personalInfoStyle.css">
+		<script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+
+	</head>
+
+	<body>
+		<div id="app">
+			<el-container>
+				<el-header style="padding: 0px">
+					<el-row>
+						<el-col :xs="8" :sm="4" :md="4" :lg="7" :xl="7">
+							<div class="nav-content" style="background-color: #6222cc; ">
+								<img src="image/book.png"
+									style="height: 40px; width: 40px; float: left; margin: 8px 15px" />
+								<img src="image/title1.png"
+									style="height: 35px; float: left; margin: 8px 0px 0px 0px" />
+							</div>
+						</el-col>
+						<el-col :xs="4" :sm="16" :md="8" :lg="10" :xl="10">
+							<div class="nav-content" style="background-color: #6222cc; padding: 0px;">
+								<el-menu :default-active="activeindex" v-if="headerShow" class="el-menu-demo"
+									mode="horizontal" @select="handleSelect" background-color="#6222cc"
+									text-color="#fff" active-text-color="#ffab0f" style="width: auto;">
+									<el-row>
+										<el-col :span="6">
+											<el-menu-item index="0">单词查询</el-menu-item>
+										</el-col>
+										<el-col :span="6">
+											<el-menu-item index="1">句子翻译</el-menu-item>
+										</el-col>
+										<el-col :span="6">
+											<el-menu-item index="2">测试题目</el-menu-item>
+										</el-col>
+										<el-col :span="6">
+											<el-menu-item index="3">单词本</el-menu-item>
+										</el-col>
+									</el-row>
+								</el-menu>
+							</div>
+						</el-col>
+						<el-col :xs="8" :sm="4" :md="4" :lg="7" :xl="7" class="nav-content"
+							style="background-color: #6222cc;">
+							<div class="nav-content" style="background-color: #6222cc;">
+								<el-menu :default-active="activeindex" background-color="#6222cc" class="el-menu-demo"
+									mode="horizontal" @select="handleSelect">
+									<el-submenu index="5" style="float: right;height: 56px;">
+										<template slot="title">
+											<el-button circle
+												style="color: white; height: 40px;width: 40px; margin: 8px 20px; padding: 0px;">
+												<img src="image/nav-icon-student-account.png"
+													style="height: 40px; width: 40px" />
+											</el-button>
+										</template>
+										<el-menu-item index="2-1" v-if="sub1Show" v-on:click="login"
+											style="font-size: 15px;">登录</el-menu-item>
+										<el-menu-item index="2-2" v-if="sub2Show" v-on:click="personalWeb"
+											style="font-size: 15px;">个人主页</el-menu-item>
+										<el-menu-item index="2-4" v-if="sub4Show" v-on:click="exit"
+											style="font-size: 15px;">退出</el-menu-item>
+									</el-submenu>
+								</el-menu>
+							</div>
+						</el-col>
+					</el-row>
+				</el-header>
+				<el-main v-if="mainWebShow">
+					<div style="height: 100%;">
+						<el-dialog id="loginid" title="登录" :visible.sync="LoginDialogVisible" width="30%" center
+							style="display: none;margin-top: 15vh;">
+							<el-input placeholder="请输入用户名" v-model="UserName" style="margin: 5px 0px;"></el-input>
+							<el-input placeholder="请输入密码" v-model="UserPwd" show-password
+								onKeyUp="value=value.replace(/[^\d|chun]/g,'')" style="margin: 5px 0px;">
+							</el-input>
+							<span slot="footer" class="dialog-footer">
+								<el-button @click="LoginDialogVisible = false">取 消</el-button>
+								<el-button type="primary" @click="LoginDialogVisible = false" v-on:click="loginconfirm">
+									确 定</el-button>
+							</span>
+						</el-dialog>
+						<el-carousel :autoplay="false" :initial-index="0" height="100%" ref="carousel"
+							v-on:change="CarouselClick">
+							<el-carousel-item>
+								<div style="height: 100%;">
+									<el-row type="flex" align="middle" style="height: 100%;">
+										<el-col :span="8">
+											<div class="grid-content bg-purple"></div>
+										</el-col>
+										<el-col :span="8">
+											<div class="grid-content bg-purple">
+												<el-input placeholder="请输入内容" prefix-icon="el-icon-search"
+													v-model="wordinput" clearable style="margin: 20px 0px;"
+													@keyup.enter.native="startSearch"></el-input>
+												<div>
+													<el-table :data="SearchResult" :show-header=false id="searchresult"
+														:span-method="objectSpanMethod" border
+														style="width: 100%; margin: 20px 0px;display: none;">
+														<el-table-column prop="col1" show-header="false">
+														</el-table-column>
+														<el-table-column prop="col2" show-header="false" align="center">
+															<template slot-scope="scope">
+																<img :src="scope.row.col2" style="height: 90px;" />
+															</template>
+														</el-table-column>
+													</el-table>
+												</div>
+											</div>
+										</el-col>
+										<el-col :span="8">
+											<div class="grid-content bg-purple"></div>
+										</el-col>
+									</el-row>
+								</div>
+							</el-carousel-item>
+							<el-carousel-item>
+								<div style="height: 100%;">
+									<el-row type="flex" align="middle" style="height: 100%;">
+										<el-col :span="11">
+											<el-input id="sentenceIn" type="textarea" :rows="10" placeholder="请输入内容"
+												v-model="textareaInput" style="width: 60%;float: right; resize: none;"
+												@keyup.enter.native="sentenceTrans">
+											</el-input>
+										</el-col>
+										<el-col :span="2">
+											<img src="image/arrow.png" style="height: 50px;" />
+										</el-col>
+										<el-col :span="11">
+											<el-input id="sentenceOut" type="textarea" :rows="10" placeholder="请输入内容"
+												v-model="textareaOutput" style="width: 60%;float: left; resize: none;">
+											</el-input>
+										</el-col>
+									</el-row>
+								</div>
+							</el-carousel-item>
+							<el-carousel-item>
+								<div style="height: 100%;">
+									<el-row type="flex" align="middle" style="height: 100%;">
+										<el-col :span="8">
+										</el-col>
+										<el-col :span="8">
+											<div id="exam" style="height: 400px;display: block;">
+												<el-button v-if="starttestShow" v-on:click="StartTest">开始测试</el-button>
+												<el-carousel :autoplay="false" :initial-index="0" height="100%"
+													ref="carousel2" arrow="never">
+													<el-carousel-item v-for="exercise in ExerciseList">
+														<div>
+															<el-row style="height: 60px;">
+																<el-tag
+																	style="height:100%; width: 100%; font-size: 30px; line-height: 60px;">
+																	{{exercise.word}}
+																</el-tag>
+															</el-row>
+															<el-row style="height: 40px;"></el-row>
+															<el-row>
+																<el-radio-group v-model="examchosen"
+																	style="width: 100%;">
+																	<div>
+																		<el-radio-button label="A">A:{{exercise.A}}
+																		</el-radio-button>
+																	</div>
+																	<div>
+																		<el-radio-button label="B">B:{{exercise.B}}
+																		</el-radio-button>
+																	</div>
+																	<div>
+																		<el-radio-button label="C">C:{{exercise.C}}
+																		</el-radio-button>
+																	</div>
+																	<div>
+																		<el-radio-button label="D">D:{{exercise.D}}
+																		</el-radio-button>
+																	</div>
+																</el-radio-group>
+															</el-row>
+															<el-row>
+																<el-button style="margin: 5px 10px; color: #6222cc;"
+																	v-on:click="NextTest(exercise)">下一题<i
+																		class="el-icon-arrow-right el-icon--right"></i>
+																</el-button>
+															</el-row>
+														</div>
+													</el-carousel-item>
+												</el-carousel>
+											</div>
+											<div id="examresult" style="height: 100%;display: none;">
+												<el-table :data="examResultList" height="500px" stripe
+													style="width: 100%;">
+													<el-table-column prop="word" label="单词" header-align="center"
+														align="center"></el-table-column>
+													<el-table-column prop="trans" label="意义" header-align="center"
+														align="center"></el-table-column>
+													<el-table-column prop="correctness" label="正误" header-align="center"
+														align="center"></el-table-column>
+													<el-table-column prop="add" label="加入单词本" header-align="center"
+														align="center">
+														<template slot-scope="scope">
+															<el-button @click="AddToBookHandle(scope.row)" type="text"
+																size="small">加入</el-button>
+														</template>
+													</el-table-column>
+												</el-table>
+												<el-button v-on:click="moretest" style="margin: 10px 0px;">再来一组
+												</el-button>
+											</div>
+										</el-col>
+										<el-col :span="8">
+										</el-col>
+									</el-row>
+								</div>
+							</el-carousel-item>
+							<el-carousel-item>
+								<div style="height: 100%;">
+									<el-row type="flex" align="middle" style="height: 100%;">
+										<el-col :span="8">
+										</el-col>
+										<el-col :span="8">
+											<el-table :data="WordBook" height="500px" stripe style="width: 100%;">
+												<el-table-column prop="word" label="单词" header-align="center"
+													align="center"></el-table-column>
+												<el-table-column prop="mistaketime" label="错误次数" header-align="center"
+													align="center"></el-table-column>
+												<el-table-column prop="detail" label="详情" header-align="center"
+													align="center">
+													<template slot-scope="scope">
+														<el-popover ref="popover" placement="right" width="400"
+															trigger="focus" :title="Detailword" :content="Detailtrans">
+														</el-popover>
+														<el-button v-popover:popover
+															@mouseover.native="handleClick(scope.row)" type="text"
+															size="small">详情
+														</el-button>
+													</template>
+												</el-table-column>
+											</el-table>
+											<el-button type="primary" v-if="isAdminShow" v-on:click="wordEdit"
+												style="margin: 10px;">修改</el-button>
+											<el-button type="primary" v-if="isAdminShow" v-on:click="wordAdd"
+												style="margin: 10px;">新增</el-button>
+										</el-col>
+										<el-col :span="8">
+										</el-col>
+									</el-row>
+									<el-dialog id="editD" title="编辑单词信息" :visible.sync="EditDialogVisible" width="30%"
+										center style="display: none;margin-top: 2vh;">
+										<el-input placeholder="单词" v-model="editWord" style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="音标" v-model="editPhoneticSymbols"
+											style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="翻译" v-model="editWordTranslation"
+											style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="难度" v-model="editDifficulty" style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="图片路径" v-model="editImagePath" style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="音频路径" v-model="editAudioPath" style="margin: 5px 0px;">
+										</el-input>
+										<span slot="footer" class="dialog-footer">
+											<el-button @click="EditDialogVisible = false">取 消</el-button>
+											<el-button id="editActionButton" type="primary"
+												@click="EditDialogVisible = false" v-on:Click="editConfirm">
+												确 定</el-button>
+										</span>
+									</el-dialog>
+									<el-dialog id="addD" title="新增单词信息" :visible.sync="AddDialogVisible" width="30%"
+										center style="display: none;margin-top: 2vh;">
+										<el-input placeholder="单词" v-model="editWord" style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="音标" v-model="editPhoneticSymbols"
+											style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="翻译" v-model="editWordTranslation"
+											style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="难度" v-model="editDifficulty" style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="图片路径" v-model="editImagePath" style="margin: 5px 0px;">
+										</el-input>
+										<el-input placeholder="音频路径" v-model="editAudioPath" style="margin: 5px 0px;">
+										</el-input>
+										<span slot="footer" class="dialog-footer">
+											<el-button @click="AddDialogVisible = false">取 消</el-button>
+											<el-button type="primary" @click="AddDialogVisible = false"
+												v-on:click="addConfirm">
+												确 定</el-button>
+										</span>
+									</el-dialog>
+								</div>
+							</el-carousel-item>
+						</el-carousel>
+					</div>
+				</el-main>
+				<el-main v-if="personalWebShow">
+					<el-row type="flex" class="row-bg" align="middle" justify="space-around" :gutter="20"
+						style="height: 90%;">
+						<el-col :span="8">
+							<el-card id="chartCitedFrame">
+								<template>
+									<el-skeleton />
+								</template>
+							</el-card>
+						</el-col>
+						<el-col :span="8">
+							<el-card id="chartWeekFrame">
+								<template>
+									<el-skeleton />
+								</template>
+							</el-card>
+						</el-col>
+						<el-col :span="8">
+							<el-card id="charCorrectionFrame">
+								<template>
+									<el-skeleton />
+								</template>
+							</el-card>
+						</el-col>
+					</el-row>
+					<el-button v-on:click="RetuenMain" type="primary">返回</el-button>
+				</el-main>
+			</el-container>
+		</div>
+	</body>
+	<script src="js/vue.js"></script>
+	<script src="js/const.js"></script>
+	<script src="js/axios.min.js"></script>
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<script>
+		var vue = new Vue({
+			"el": "#app",
+			"data": {
+				"selectedpage": "",
+				"activeindex": "0",
+				"carouselindex": "0",
+				"LoginDialogVisible": "",
+				"UserName": "",
+				"UserPwd": "",
+				"sub1Show": true,
+				"sub2Show": false,
+				"sub4Show": false,
+				"HasLogin": false,
+				"headerShow": true,
+
+				"userId": "",
+
+				"wordinput": "",
+				"SearchResult": [],
+
+				"textareaInput": "",
+				"textareaOutput": "",
+
+				"starttestShow": true,
+				"ExerciseList": [],
+				"examResultList": [],
+				"examchosen": "",
+				"doneexam": 0,
+
+				"WordBook": [],
+				"Detailword": "",
+				"Detailtrans": "",
+
+				"RPC": [],
+				"RPM": [],
+
+				"EditDialogVisible": false,
+				"AddDialogVisible": false,
+
+				//对话框所需的内容，若为编辑操作，则需要先对单词信息赋值
+				//若为插入操作，则可留空，再获取用户输入
+				"editWord": "",
+				"editPhoneticSymbols": "",
+				"editWordTranslation": "",
+				"editDifficulty": "",
+				"editImagePath": "",
+				"editAudioPath": "",
+
+				"mainWebShow": true,
+				"personalWebShow": false,
+				"isAdminShow": false,
+
+				"citedWords": 10,
+				"totalWords": 160,
+				"weekWords": [
+					127, 92, 53, 60, 75, 96, 0
+				],
+				"weekCorrection": [
+					82, 77, 90, 68, 62, 72, 0
+				]
+			},
+			methods: {
+				// 导航栏函数
+				handleSelect: function (key) {
+					var index = vue.activeindex
+					if (index == key || key == 5) {
+
+					} else {
+						if (key == 0) {
+							this.$refs.carousel.setActiveItem(key)
+						} else if (key == 1) {
+							this.$refs.carousel.setActiveItem(key)
+							var searchObject = document.getElementById("searchresult")
+							searchObject.style.display = "none"
+						} else if (key == 2) {
+							this.$refs.carousel.setActiveItem(key)
+							var searchObject = document.getElementById("searchresult")
+							searchObject.style.display = "none"
+						} else if (key == 3) {
+							this.$refs.carousel.setActiveItem(key)
+							var searchObject = document.getElementById("searchresult")
+							searchObject.style.display = "none"
+							if (vue.HasLogin)
+								this.$options.methods.getWordBook()
+						}
+					}
+				},
+				login: function () {
+					var logObj = document.getElementById("loginid")
+					logObj.style.display = "block"
+					vue.LoginDialogVisible = true
+				},
+				personalWeb: function () {
+					vue.headerShow = false
+					vue.mainWebShow = false
+					vue.personalWebShow = true
+
+					this.$options.methods.initChart();
+					this.initChart();
+				},
+				managementWeb: function () {
+
+				},
+				exit: function () {
+					vue.HasLogin = false
+					vue.isAdminShow = false
+					vue.sub1Show = true
+					vue.sub2Show = false
+					vue.sub4Show = false
+
+					this.$message({
+						showClose: true,
+						message: '退出成功！',
+						type: 'success'
+					});
+
+					setTimeout(() => {
+						location.reload()
+					}, 2000);
+
+				},
+				loginconfirm: function () {
+					var url = serverUrl + "/user/login?userName=" + vue.UserName + "&userPassword=" + vue.UserPwd
+
+					axios.get(url)
+						.then(function (response) {
+							var result = response.data.state
+
+							//登录成功
+							if (result == "0") {
+								vue.HasLogin = true
+								vue.userId = response.data.payload.userId
+								var type = response.data.payload.userType
+								//普通用户
+								if (type == "0") {
+									vue.sub1Show = false
+									vue.sub2Show = true
+									vue.sub4Show = true
+								} else {
+									vue.isAdminShow = true
+									vue.sub1Show = false
+									vue.sub2Show = true
+									vue.sub4Show = true
+								}
+
+								vue.$message({
+									showClose: true,
+									message: '登陆成功！',
+									type: 'success'
+								});
+							} else {
+								vue.$message({
+									showClose: true,
+									message: '登陆失败，请检查用户名或密码',
+									type: 'error'
+								});
+							}
+						})
+						.catch()
+				},
+
+				//页面切换函数
+				CarouselClick: function () {
+					var activepage = this.$refs.carousel.activeIndex
+					vue.activeindex = activepage.toString()
+				},
+
+				// 搜索页面函数
+				startSearch: function () {
+					var word = vue.wordinput
+					var url = serverUrl + "/word/search?englishWords=" + word
+
+					axios.get(url)
+						.then(function (response) {
+							var payload = response.data.payload
+							vue.$set(vue.SearchResult, 0, {
+								col1: payload.word + "\u3000" + payload.symbol,
+								col2: payload.imagePath
+							})
+							vue.$set(vue.SearchResult, 1, {
+								col1: payload.difficulty,
+								col2: ""
+							})
+							vue.$set(vue.SearchResult, 2, {
+								col1: payload.trans,
+								col2: ""
+							})
+						})
+						.catch(function (e) {
+							console.log(e)
+						})
+
+					var searchObject = document.getElementById("searchresult")
+					searchObject.style.display = "block"
+				},
+				objectSpanMethod: function ({
+					row,
+					column,
+					rowIndex,
+					columnIndex
+				}) {
+					if (rowIndex == 0 && columnIndex == 1) {
+						return [2, 1]
+					} else if (rowIndex == 2 && columnIndex == 0) {
+						return [1, 2]
+					} else {
+						return [1, 1]
+					}
+				},
+
+				//句子翻译页面函数
+				sentenceTrans: function () {
+					var CHpattern = new RegExp("[\u4E00-\u9FA5]+")
+					var ENpattern = new RegExp("[A-Za-z]+")
+					var src
+					var dst
+					if (CHpattern.test(vue.textareaInput)) {
+						src = "zh-CHS"
+						dst = "en"
+					} else if (ENpattern.test(vue.textareaInput)) {
+						src = "en"
+						dst = "zh-CHS"
+					} else {
+						this.$message({
+							showClose: true,
+							message: '请输入中文或英文',
+							type: 'error'
+						})
+					}
+
+					var url = serverUrl + "/translate?dstLang=" + dst + "&srcLang=" + src + "&srcText=" + vue
+						.textareaInput
+
+					axios.get(url)
+						.then(function (response) {
+							vue.textareaOutput = response.data.payload[0]
+						})
+						.catch(function (e) {
+							console.log(e)
+						})
+				},
+
+				// 测试题目页面函数
+				StartTest: async function () {
+					vue.starttestShow = false
+
+					var url = serverUrl + "/word/test"
+
+					for (var i = 0; i < 10; i++) {
+						await axios.get(url)
+							.then(function (response) {
+								var payload = response.data.payload
+								var ANS
+								var ANStrans
+								if (payload.answer == 0) {
+									ANS = "A"
+									ANStrans = payload.a
+								} else if (payload.answer == 1) {
+									ANS = "B"
+									ANStrans = payload.b
+								} else if (payload.answer == 2) {
+									ANS = "C"
+									ANStrans = payload.c
+								} else if (payload.answer == 3) {
+									ANS = "D"
+									ANStrans = payload.d
+								}
+
+								vue.$set(vue.ExerciseList, i, {
+									word: payload.word + "\u3000\u3000" + payload.symbol,
+									A: "\u3000" + payload.a,
+									B: "\u3000" + payload.b,
+									C: "\u3000" + payload.c,
+									D: "\u3000" + payload.d,
+									ans: ANS,
+									anstrans: ANStrans,
+									mistake: 0
+								})
+							})
+							.catch()
+					}
+				},
+				NextTest: function (exercise) {
+					console.log(exercise.ans)
+					console.log(vue.examchosen)
+					if (exercise.ans != vue.examchosen) {
+						exercise.mistake = exercise.mistake + 1
+					}
+
+					if (++vue.doneexam == 9) {
+						var examObject = document.getElementById("exam")
+						var resultObject = document.getElementById("examresult")
+						examObject.style.display = "none"
+						resultObject.style.display = "block"
+						this.$message({
+							message: "您已完成答题！",
+							type: "success"
+						})
+
+						for (var i = 0; i < 10; i++) {
+							if (vue.ExerciseList[i].mistake == 0) {
+								vue.$set(vue.examResultList, i, {
+									word: vue.ExerciseList[i].word,
+									trans: vue.ExerciseList[i].anstrans,
+									correctness: "√"
+								})
+							} else {
+								vue.$set(vue.examResultList, i, {
+									word: vue.ExerciseList[i].word,
+									trans: vue.ExerciseList[i].anstrans,
+									correctness: "X"
+								})
+							}
+						}
+					}
+
+					this.$refs.carousel2.next()
+					vue.examchosen = ""
+				},
+				AddToBookHandle: function (row) {
+					if (vue.userId == "") {
+						vue.$message({
+							message: '请先登录再使用本功能！',
+							type: 'warning'
+						});
+
+						return
+					}
+
+					var word = row.word.split("\u3000\u3000")
+					var url = serverUrl + "/word/collect?id=" + vue.userId + "&word=" + word[0]
+					axios.get(url)
+						.then(function (response) {
+							//添加成功
+							if (response.data.state == "0") {
+								vue.$message({
+									showClose: true,
+									message: '添加成功！',
+									type: 'success'
+								});
+							} else {
+								vue.$message({
+									showClose: true,
+									message: '已加入单词本',
+									type: 'warning'
+								});
+							}
+						})
+						.catch()
+				},
+				moretest: function () {
+					this.$options.methods.getExerciseList()
+					this.$refs.carousel2.activeIndex = "0"
+
+					if (vue.userId != "") {
+						//向后端增加错误次数
+						for (var i = 0; i < 10; i++) {
+							if (vue.examResultList[i].mistake != 0) {
+								var word = vue.examResultList[i].word.split("\u3000\u3000")
+								var url = serverUrl + "/word/mistake?id=" + vue.userId + "&word=" + word[0]
+								axios.get(url)
+									.then(function (response) {
+										if (response.data.state != "0") {
+											vue.$message({
+												showClose: true,
+												message: '自动记录错误信息失败！',
+												type: 'error'
+											});
+										}
+									})
+									.catch()
+							}
+						}
+					}
+
+					var examObject = document.getElementById("exam")
+					var resultObject = document.getElementById("examresult")
+					vue.doneexam = 0
+					examObject.style.display = "block"
+					resultObject.style.display = "none"
+				},
+				getExerciseList: async function () {
+					var url = serverUrl + "/word/test"
+
+					for (var i = 0; i < 10; i++) {
+						await axios.get(url)
+							.then(function (response) {
+								var payload = response.data.payload
+								var ANS
+								var ANStrans
+								if (payload.answer == 0) {
+									ANS = "A"
+									ANStrans = payload.a
+								} else if (payload.answer == 1) {
+									ANS = "B"
+									ANStrans = payload.b
+								} else if (payload.answer == 2) {
+									ANS = "C"
+									ANStrans = payload.c
+								} else if (payload.answer == 3) {
+									ANS = "D"
+									ANStrans = payload.d
+								}
+
+								vue.$set(vue.ExerciseList, i, {
+									word: payload.word + "\u3000\u3000" + payload.symbol,
+									A: "\u3000" + payload.a,
+									B: "\u3000" + payload.b,
+									C: "\u3000" + payload.c,
+									D: "\u3000" + payload.d,
+									ans: ANS,
+									anstrans: ANStrans,
+									mistake: 0
+								})
+							})
+							.catch()
+					}
+				},
+
+				//单词本页面函数
+				getWordBook: function () {
+					if (vue.userId == "") {
+						vue.$message({
+							message: '请先登录再使用本功能！',
+							type: 'warning'
+						});
+
+						return
+					}
+
+					var urlM = serverUrl + "/user/mistakeInfo?id=" + vue.userId
+					axios.get(urlM)
+						.then(function (response) {
+							var payload = response.data.payload
+
+							for (var i = 0; i < payload.length; i++) {
+								vue.$set(vue.WordBook, i, {
+									word: payload[i].englishWords,
+									mistaketime: payload[i].mistakeCount
+								})
+							}
+
+						})
+						.catch()
+
+				},
+				handleClick: function (row) {
+					// DetailList
+					// 	"word": "Book\\书\u3000[bʊk]",
+					// 	"illustration": "This is a good book.\n这是一本好书"
+					var word = row.word
+					var url = serverUrl + "/word/search?englishWords=" + word
+					axios.get(url)
+						.then(function (response) {
+							var payload = response.data.payload
+							vue.Detailword = payload.word
+							vue.Detailtrans = payload.symbol + "\u3000" + payload.trans
+						})
+						.catch(function (e) {
+							console.log(e)
+						})
+
+				},
+
+				//单词编辑函数
+				wordEdit: function () {
+					vue.EditDialogVisible = true
+				},
+
+				//单词添加函数
+				wordAdd: function () {
+					vue.AddDialogVisible = true;
+				},
+
+				//编辑确认函数
+				editConfirm: function () {
+					//alert("233");
+					var word = this.editWord;
+					var phoneticSymbols = this.editPhoneticSymbols;
+					var wordTranslation = this.editWordTranslation;
+					var difficulty = this.editDifficulty;
+					var imagePath = this.editImagePath;
+					var audioPath = this.editAudioPath;
+					var wordInfo = {
+						"word": word,
+						"phoneticSymbols": phoneticSymbols,
+						"wordTranslation": wordTranslation,
+						"difficulty": difficulty,
+						"imagePath": imagePath,
+						"audioPath": audioPath
+					};
+					axios.get(
+						serverUrl + "/word/update" + "?englishWords=" + word + "&phoneticSymbols=" + phoneticSymbols + "&wordsTranslation=" + wordTranslation + "&difficulty=" + difficulty + "&imagePath=" + imagePath + "&audioPath=" + audioPath
+					).then(function (response) {
+						console.log(response);
+					}).catch(function (error) {
+						console.log(error);
+					});
+				},
+
+				//添加确认函数
+				addConfirm: function () {
+					//alert("234");
+					var word = this.editWord;
+					var phoneticSymbols = this.editPhoneticSymbols;
+					var wordTranslation = this.editWordTranslation;
+					var difficulty = this.editDifficulty;
+					var imagePath = this.editImagePath;
+					var audioPath = this.editAudioPath;
+					var wordInfo = {
+						"word": word,
+						"phoneticSymbols": phoneticSymbols,
+						"wordTranslation": wordTranslation,
+						"difficulty": difficulty,
+						"imagePath": imagePath,
+						"audioPath": audioPath
+					};
+					axios.get(
+						serverUrl + "/word/insert" + "?englishWords=" + word + "&phoneticSymbols=" + phoneticSymbols + "&wordsTranslation=" + wordTranslation + "&difficulty=" + difficulty + "&imagePath=" + imagePath + "&audioPath=" + audioPath
+					).then(function (response) {
+						console.log(response);
+					}).catch(function (error) {
+						console.log(error);
+					});
+				},
+
+				RetuenMain: function () {
+					vue.headerShow = true
+					vue.mainWebShow = true
+					vue.personalWebShow = false
+				},
+
+				//图表页面函数
+				initChart: function () {
+					var chartCitedFrame = document.getElementById("chartCitedFrame");
+					chartCitedFrame.innerHTML = '<div id="chartCited" style="width: 500px;height:500px;"></div>';
+					var chartCited = echarts.init(document.getElementById('chartCited'));
+
+					var chartCitedOption = {
+						title: {
+							text: 'Cited Words',
+							left: 'center'
+						},
+						tooltip: {
+							trigger: 'item',
+							formatter: '{a} <br/>{b} : {c} ({d}%)'
+						},
+						legend: {
+							orient: 'vertical',
+							left: 'left',
+							data: ['Cited']
+						},
+						series: [{
+							color: '#67C23A',
+							name: 'Cited',
+							type: 'pie',
+							radius: ['30%', '55%'],
+							center: ['50%', '60%'],
+							itemStyle: {
+								normal: {
+									// 阴影的大小
+									shadowBlur: 20,
+									// 阴影水平方向上的偏移
+									shadowOffsetX: 0,
+									// 阴影垂直方向上的偏移
+									shadowOffsetY: 0,
+									// 阴影颜色
+									shadowColor: 'rgba(0, 0, 0, 0.5)'
+								}
+							},
+							data: [{
+								value: this.citedWords,
+								name: '已背单词',
+								itemStyle: {
+									normal: {
+										color: '#67C23A'
+									}
+								}
+							},
+							{
+								value: this.totalWords - this.citedWords,
+								name: '未背单词',
+								itemStyle: {
+									normal: {
+										color: '#409EFF'
+									}
+								}
+							}
+							],
+							emphasis: {
+								itemStyle: {
+									shadowBlur: 10,
+									shadowOffsetX: 0,
+									shadowColor: 'rgba(0, 0, 0, 0.5)'
+								}
+							}
+						}]
+					};
+
+					chartCited.setOption(chartCitedOption);
+
+					var chartWeekFrame = document.getElementById("chartWeekFrame");
+					chartWeekFrame.innerHTML = '<div id="chartWeek" style="width: 500px;height:500px;"></div>';
+					var chartWeek = echarts.init(document.getElementById('chartWeek'));
+
+					var chartWeekOption = {
+						title: {
+							text: 'Weekly Words',
+							left: 'center'
+						},
+						tooltip: {
+							trigger: 'axis',
+							axisPointer: {
+								type: 'shadow'
+							}
+						},
+						legend: {
+							orient: 'vertical',
+							left: 'left',
+							data: ['Weekly']
+						},
+						grid: {
+							left: '3%',
+							right: '6%',
+							bottom: '4%',
+						},
+						xAxis: {
+							type: 'category',
+							"axisLine": { //x轴
+								"show": false
+
+							},
+							"axisTick": { //x轴刻度线
+								"show": false
+							},
+							"splitLine": { //网格线
+								"show": false
+							},
+							data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+						},
+						yAxis: {
+							type: 'value',
+							show: false,
+							"splitLine": {
+								"show": false
+							}
+						},
+						series: [{
+							itemStyle: {
+								//柱形图圆角，鼠标移上去效果，如果只是一个数字则说明四个参数全部设置为那么多
+								normal: {
+									//柱形图圆角，初始化效果
+									barBorderRadius: [20, 20, 0, 0],
+									color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+										offset: 0,
+										color: '#B8DBFF'
+									}, {
+										offset: 1,
+										color: '#409EFF'
+									}]),
+								}
+							},
+							barWidth: 20,
+							name: 'Weekly',
+							type: 'bar',
+							data: this.weekWords
+						}]
+					};
+
+					chartWeek.setOption(chartWeekOption);
+
+					var charCorrectionFrame = document.getElementById("charCorrectionFrame");
+					charCorrectionFrame.innerHTML =
+						'<div id="charCorrection" style="width: 500px;height:500px;"></div>';
+					var charCorrection = echarts.init(document.getElementById('charCorrection'));
+
+					var charCorrectionOption = {
+						title: {
+							text: 'Weekly Correction',
+							left: 'center'
+						},
+						tooltip: {
+							trigger: 'axis',
+							axisPointer: {
+								type: 'shadow'
+							}
+						},
+						legend: {
+							orient: 'vertical',
+							left: 'left',
+							data: ['Weekly']
+						},
+						grid: {
+							left: '3%',
+							right: '6%',
+							bottom: '3%',
+							containLabel: true
+						},
+						xAxis: {
+							type: 'category',
+							data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+						},
+						yAxis: {
+							type: 'value',
+							max: 100,
+							"splitLine": {
+								"show": false
+							},
+							"axisLine": { //y轴
+								"show": false
+
+							},
+							"axisTick": { //y轴刻度线
+								"show": false
+							}
+						},
+						series: [{
+							color: '#67C23A',
+							name: 'Weekly',
+							type: 'line',
+							data: this.weekCorrection
+						}]
+					};
+
+					charCorrection.setOption(charCorrectionOption);
+				}
+			},
+			mounted() {
+				this.LoginDialogVisible = false
+			}
+		})
+	</script>
+
+</html>

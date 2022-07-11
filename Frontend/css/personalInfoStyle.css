@@ -1,0 +1,142 @@
+.el-container {
+	/*设置内部填充为0，几个布局元素之间没有间距*/
+	padding: 0px !important;
+	/*外部间距也是如此设置*/
+	margin: 0px !important;
+	height: 100vh;
+}
+
+.el-main {
+	text-align: center;
+	line-height: auto;
+}
+
+.el-header,
+.el-footer {
+	text-align: center;
+	line-height: 56px;
+}
+
+.el-menu {
+	align-items: center;
+}
+
+.el-menu.el-menu--horizontal {
+	border-bottom: none;
+}
+
+.el-menu-item {
+	font-size: 20px;
+	font-weight: 600;
+	font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
+
+.el-menu--horizontal>.el-submenu .el-submenu__title {
+	height: 56px;
+	line-height: 56px;
+}
+
+.el-menu--horizontal>.el-submenu.is-active .el-submenu__title {
+	border-bottom: none;
+}
+
+.el-menu--horizontal .el-menu .el-menu-item,
+.el-menu--horizontal .el-menu .el-submenu__title {
+	color: #FFFFFF;
+}
+
+.el-menu--horizontal .el-menu .el-menu-item.is-active,
+.el-menu--horizontal .el-menu .el-submenu.is-active>.el-submenu__title {
+	color: #FFFFFF;
+}
+
+.el-menu--horizontal .el-menu-item:not(.is-disabled):focus,
+.el-menu--horizontal .el-menu-item:not(.is-disabled):hover {
+	color: #ffab0f;
+}
+
+.grid-content {
+	border-radius: 4px;
+	min-height: 36px;
+}
+
+.nav-content {
+	height: 56px;
+}
+
+.el-input__inner {
+	border-color: black;
+	border-width: 2px;
+	color: black;
+}
+
+.el-textarea__inner {
+	border-color: black;
+	border-width: 2px;
+	color: black;
+}
+
+.el-table {
+	border-radius: 6px 6px 6px 6px;
+	border-top: 2px solid #000000;
+	border-left: 2px solid #000000;
+	border-right: 2px solid #000000;
+	border-bottom: 2px solid #000000;
+}
+
+.el-table--border::after,
+.el-table--group::after,
+.el-table::before {
+	background-color: illustrationparent;
+}
+
+
+.el-table .cell {
+	white-space: pre-line;
+}
+
+.el-icon-search:before {
+	color: black;
+}
+
+.el-carousel {
+	height: 100%;
+}
+
+.el-carousel__container {
+	height: 100%;
+}
+
+.el-radio-button {
+	width: 100%;
+	margin: 5px 0px;
+	border: #000000;
+	border-width: 2px;
+}
+
+.el-radio-button__inner {
+	width: 100%;
+	text-align: left;
+	color: #6222cc;
+	border: 1px solid #000000;
+}
+
+.el-radio-button:first-child .el-radio-button__inner {
+	border-left: 1px solid #000000;
+}
+
+.el-radio-button__orig-radio:checked+.el-radio-button__inner {
+	background-color: #6222cc;
+	border-width: 2px;
+}
+
+.el-tag {
+	color: #6222cc;
+	background-color: #FFFFFF;
+	border: 1px solid #000000;
+	margin: 0px 0px;
+}
+
+body {
+	margin: 0px;
+}
